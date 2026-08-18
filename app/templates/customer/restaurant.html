@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}{{ restaurant.name }}{% endblock %}
+{% block content %}
+{% if restaurant.cover_image_url %}<img src="{{ restaurant.cover_image_url }}" style="width:100%; max-height:220px; object-fit:cover; border-radius:10px;">{% endif %}
+<h2>{{ restaurant.name }}</h2>
+<p>{{ restaurant.description or '' }}</p>
+<p>
+    <span class="badge">₦{{ "%.2f"|format(restaurant.delivery_fee) }} delivery</span>
+    <span class="badge">Min order ₦{{ "%.2f"|format(restaurant.minimum_order_amount) }}</span>
+    {% if restaurant.opening_hours %}<span class="badge">{{ restaurant.opening_hours }}</span>{% endif %}
+</p>
+
+{% for cat in categories %}
+<h3>{{ cat.name }}</h3>
+<div class="grid">
+    {% for item in cat.food_items if item.is_available %}
+    {% include "customer/_food_item_card.html" %}
+    {% endfor %}
+</div>
+{% endfor %}
+
+{% if uncategorized %}
+<h3>Other Items</h3>
+<div class="grid">
+    {% for item in uncategorized %}
+    {% include "customer/_food_item_card.html" %}
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

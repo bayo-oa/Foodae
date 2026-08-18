@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Register{% endblock %}
+{% block content %}
+<h2>Create an account</h2>
+<form method="POST">
+    <label>Full name</label>
+    <input type="text" name="full_name" value="{{ form.get('full_name','') }}" required>
+
+    <label>Email</label>
+    <input type="email" name="email" value="{{ form.get('email','') }}" required>
+
+    <label>Phone</label>
+    <input type="text" name="phone" value="{{ form.get('phone','') }}">
+
+    <label>I am a</label>
+    <select name="role">
+        <option value="CUSTOMER" {% if form.get('role')=='CUSTOMER' %}selected{% endif %}>Customer</option>
+        <option value="VENDOR" {% if form.get('role')=='VENDOR' %}selected{% endif %}>Restaurant / Vendor</option>
+        <option value="RIDER" {% if form.get('role')=='RIDER' %}selected{% endif %}>Delivery Rider</option>
+    </select>
+
+    <label>Password</label>
+    <input type="password" name="password" required>
+
+    <label>Confirm password</label>
+    <input type="password" name="confirm_password" required>
+
+    <button type="submit">Register</button>
+</form>
+<p>Already have an account? <a href="{{ url_for('auth.login') }}">Login</a></p>
+{% endblock %}

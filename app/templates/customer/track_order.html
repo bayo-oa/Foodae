@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Track Order {{ order.order_number }}{% endblock %}
+{% block content %}
+<h2>Track Order {{ order.order_number }}</h2>
+
+<div class="timeline" id="timeline">
+    {% for label, statuses in timeline_steps %}
+    <div class="timeline-step" data-statuses="{{ statuses|join(',') }}">{{ label }}</div>
+    {% endfor %}
+</div>
+
+<div class="card">
+    <p>Status: <span id="status-label" class="badge badge-status">{{ STATUS_LABELS.get(order.status, order.status) }}</span></p>
+    <p>Restaurant: {{ order.restaurant.name }}</p>
+    <div id="rider-info" style="{% if not order.rider %}display:none;{% endif %}">
+        <p>Rider: <span id="rider-name">{{ order.rider.full_name if order.rider else '' }}</span>
+           {% if order.rider and order.rider.phone %}(<a href="tel:{{ order.rider.phone }}" id="rider-phone">{{ order.rider.phone }}</a>){% endif %}
+        </p>
+    </div>
+</div>
+
+<script>
+const orderId = "{{ order.id }}";
+const statusUrl = "{{ url_for('customer.order_status_json', order_id=order.id) }}";
+
+function paintTimeline(status) {
+    document.querySelectorAll('.timeline-step').forEach(el => {
+        const statuses = el.dataset.statuses.split(',');
+        el.classList.remove('done', 'current');
+        if (statuses.includes(status)) {
+            el.classList.add('current');
+        }
+    });
+    // mark all steps before current as done
+    const steps = document.querySelectorAll('.timeline-step');
+    let currentIndex = -1;
+    steps.forEach((el, i) => { if (el.classList.contains('current')) currentIndex = i; });
+    steps.forEach((el, i) => { if (i < currentIndex) { el.classList.remove('current'); el.classList.add('done'); } });
+}
+
+function poll() {
+    fetch(statusUrl).then(r => r.json()).then(data => {
+        document.getElementById('status-label').textContent = data.status_label;
+        paintTimeline(data.status);
+        if (data.rider_name) {
+            document.getElementById('rider-info').style.display = 'block';
+            document.getElementById('rider-name').textContent = data.rider_name;
+        }
+        if (data.status !== 'DELIVERED' && data.status !== 'CANCELLED') {
+            setTimeout(poll, 18000); // poll every ~18s -- balances freshness with server/battery load
+        }
+    }).catch(() => setTimeout(poll, 20000));
+}
+paintTimeline("{{ order.status }}");
+setTimeout(poll, 18000);
+</script>
+{% endblock %}

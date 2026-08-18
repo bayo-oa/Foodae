@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Order {{ order.order_number }}{% endblock %}
+{% block content %}
+<h2>Order {{ order.order_number }}</h2>
+<div class="card">
+    <p><strong>Status:</strong> <span class="badge badge-status">{{ STATUS_LABELS.get(order.status, order.status) }}</span></p>
+    <p><strong>Customer:</strong> {{ order.customer.full_name }} — {{ order.customer.phone or order.delivery_address.phone }}</p>
+    <p><strong>Delivery address:</strong> {{ order.delivery_address.full_address }}</p>
+    {% if order.special_instructions %}<p><strong>Instructions:</strong> {{ order.special_instructions }}</p>{% endif %}
+
+    <table>
+        <tr><th>Item</th><th>Qty</th><th>Unit Price</th><th>Subtotal</th></tr>
+        {% for it in order.items %}
+        <tr>
+            <td>{{ it.food_name_snapshot }}{% if it.special_instructions %}<br><small>{{ it.special_instructions }}</small>{% endif %}</td>
+            <td>{{ it.quantity }}</td>
+            <td>₦{{ "%.2f"|format(it.unit_price) }}</td>
+            <td>₦{{ "%.2f"|format(it.unit_price * it.quantity) }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <p>Subtotal: ₦{{ "%.2f"|format(order.subtotal) }}</p>
+    <p>Delivery Fee: ₦{{ "%.2f"|format(order.delivery_fee) }}</p>
+    <p><strong>Total: ₦{{ "%.2f"|format(order.total) }}</strong></p>
+
+    {% set next_statuses = get_allowed_next_statuses(order.status) %}
+    {% if next_statuses %}
+    <div style="margin-top:14px; display:flex; gap:8px; flex-wrap:wrap;">
+        {% for ns in next_statuses %}
+        <form method="POST" action="{{ url_for('vendor.update_order_status', order_id=order.id) }}" onsubmit="{% if ns=='CANCELLED' %}return confirm('Cancel this order?');{% endif %}">
+            <input type="hidden" name="new_status" value="{{ ns }}">
+            {% if ns == 'CANCELLED' %}
+            <input type="text" name="reason" placeholder="Cancellation reason" style="display:inline-block; width:180px;">
+            {% endif %}
+            <button type="submit" class="{% if ns=='CANCELLED' %}btn-danger{% endif %}">Move to {{ STATUS_LABELS.get(ns, ns) }}</button>
+        </form>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p style="color:#888;">No further actions available for this order.</p>
+    {% endif %}
+</div>
+<a href="{{ url_for('vendor.orders') }}">&larr; Back to orders</a>
+{% endblock %}

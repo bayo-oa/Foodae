@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Rider Dashboard{% endblock %}
+{% block content %}
+<h2>Rider Dashboard</h2>
+<p><a href="{{ url_for('rider.history') }}">View earnings & delivery history</a> — {{ completed_today }} delivered today</p>
+
+<h3>Active Delivery</h3>
+{% if active %}
+    {% for order in active %}
+    <div class="card">
+        <p><strong>{{ order.order_number }}</strong> — {{ order.restaurant.name }}</p>
+        <p>Pickup: {{ order.restaurant.address or 'Address not set' }}</p>
+        <p>Deliver to: {{ order.delivery_address.full_address }}</p>
+        <p>Customer: {{ order.customer.full_name }}
+            {% if order.delivery_address.phone %}(<a href="tel:{{ order.delivery_address.phone }}">{{ order.delivery_address.phone }}</a>){% endif %}
+        </p>
+        <p>Status: <span class="badge badge-status">{{ STATUS_LABELS.get(order.status, order.status) }}</span></p>
+        <div style="display:flex; gap:8px; margin-top:8px;">
+        {% if order.status == 'RIDER_ASSIGNED' %}
+            <form method="POST" action="{{ url_for('rider.update_delivery_status', order_id=order.id) }}">
+                <input type="hidden" name="new_status" value="ORDER_PICKED_UP">
+                <button type="submit">Confirm Pickup</button>
+            </form>
+        {% elif order.status == 'ORDER_PICKED_UP' %}
+            <form method="POST" action="{{ url_for('rider.update_delivery_status', order_id=order.id) }}">
+                <input type="hidden" name="new_status" value="OUT_FOR_DELIVERY">
+                <button type="submit">Start Delivery</button>
+            </form>
+        {% elif order.status == 'OUT_FOR_DELIVERY' %}
+            <form method="POST" action="{{ url_for('rider.update_delivery_status', order_id=order.id) }}">
+                <input type="hidden" name="new_status" value="DELIVERED">
+                <button type="submit">Confirm Delivery</button>
+            </form>
+        {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+{% else %}
+<p>No active delivery.</p>
+{% endif %}
+
+<h3>Available Deliveries</h3>
+{% if available %}
+<div class="grid">
+    {% for order in available %}
+    <div class="card">
+        <p><strong>{{ order.order_number }}</strong></p>
+        <p>{{ order.restaurant.name }}</p>
+        <p>Pickup: {{ order.restaurant.address or 'Not set' }}</p>
+        <p>Est. earning: ₦{{ "%.2f"|format(order.delivery_fee) }}</p>
+        <form method="POST" action="{{ url_for('rider.accept_delivery', order_id=order.id) }}">
+            <button type="submit">Accept</button>
+        </form>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p>No deliveries available right now.</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Complete Your Rider Profile{% endblock %}
+{% block content %}
+<h2>Complete your rider profile</h2>
+<form method="POST">
+    <label>Phone number</label>
+    <input type="text" name="phone" required>
+    <label>Vehicle type</label>
+    <select name="vehicle_type">
+        <option value="Bicycle">Bicycle</option>
+        <option value="Motorcycle">Motorcycle</option>
+        <option value="Car">Car</option>
+    </select>
+    <button type="submit">Save & Continue</button>
+</form>
+{% endblock %}

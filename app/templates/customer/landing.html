@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}{{ restaurant.name }}{% endblock %}
+{% block content %}
+
+<section class="hero">
+    {% if restaurant.cover_image_url %}
+    <img src="{{ restaurant.cover_image_url }}" alt="{{ restaurant.name }}"
+         style="width:100%; max-height:320px; object-fit:cover; border-radius:12px;">
+    {% endif %}
+    <div style="margin-top:16px;">
+        {% if restaurant.logo_url %}
+        <img src="{{ restaurant.logo_url }}" alt="{{ restaurant.name }} logo"
+             style="width:72px; height:72px; object-fit:cover; border-radius:50%; float:left; margin-right:16px;">
+        {% endif %}
+        <h1 style="margin-bottom:4px;">{{ restaurant.name }}</h1>
+        <p style="color:#666;">{{ restaurant.description or "Delicious food, made fresh, delivered to you." }}</p>
+    </div>
+
+    <div style="margin-top:12px;">
+        <span class="badge">{{ "Open now" if restaurant.is_open else "Currently closed" }}</span>
+        <span class="badge">₦{{ "%.2f"|format(restaurant.delivery_fee) }} delivery fee</span>
+        <span class="badge">Min order ₦{{ "%.2f"|format(restaurant.minimum_order_amount) }}</span>
+        {% if restaurant.opening_hours %}<span class="badge">{{ restaurant.opening_hours }}</span>{% endif %}
+    </div>
+
+    <div style="margin-top:20px;">
+        <a href="#menu" class="btn">Order Now</a>
+    </div>
+</section>
+
+<section style="margin-top:36px;">
+    <h2>About Us</h2>
+    <p>{{ restaurant.description or "We're a local kitchen serving great food to our community. Browse our menu below and place your order online — it's quick and easy." }}</p>
+</section>
+
+<section style="margin-top:28px;">
+    <h2>Our Services</h2>
+    <div class="grid">
+        <div class="card">
+            <strong>Online Ordering</strong>
+            <p style="font-size:0.9rem; color:#666;">Browse our full menu and order directly from this site.</p>
+        </div>
+        <div class="card">
+            <strong>Delivery</strong>
+            <p style="font-size:0.9rem; color:#666;">
+                We deliver to your address for a flat fee of ₦{{ "%.2f"|format(restaurant.delivery_fee) }}.
+            </p>
+        </div>
+        <div class="card">
+            <strong>Order Tracking</strong>
+            <p style="font-size:0.9rem; color:#666;">Track your order's status from confirmation to delivery.</p>
+        </div>
+    </div>
+</section>
+
+<section id="menu" style="margin-top:36px;">
+    <h2>Menu</h2>
+
+    {% if not categories and not uncategorized %}
+    <p style="color:#666;">Our menu is being updated — please check back shortly.</p>
+    {% endif %}
+
+    {% for cat in categories %}
+        {% set available_items = cat.food_items | selectattr("is_available") | list %}
+        {% if available_items %}
+        <h3>{{ cat.name }}</h3>
+        <div class="grid">
+            {% for item in available_items %}
+            {% include "customer/_food_item_card.html" %}
+            {% endfor %}
+        </div>
+        {% endif %}
+    {% endfor %}
+
+    {% if uncategorized %}
+    <h3>Other Items</h3>
+    <div class="grid">
+        {% for item in uncategorized %}
+        {% include "customer/_food_item_card.html" %}
+        {% endfor %}
+    </div>
+    {% endif %}
+</section>
+
+<section style="margin-top:36px;">
+    <h2>Contact & Location</h2>
+    <p>{{ restaurant.address }}</p>
+</section>
+
+{% endblock %}

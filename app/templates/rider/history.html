@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Delivery History{% endblock %}
+{% block content %}
+<h2>Earnings & History</h2>
+<div class="stats-row">
+    <div class="stat-box"><div class="num">₦{{ "%.2f"|format(today_earnings) }}</div><div class="label">Today</div></div>
+    <div class="stat-box"><div class="num">₦{{ "%.2f"|format(week_earnings) }}</div><div class="label">This Week</div></div>
+    <div class="stat-box"><div class="num">{{ completed|length }}</div><div class="label">Total Completed</div></div>
+</div>
+
+<table style="margin-top:16px;">
+    <tr><th>Order #</th><th>Restaurant</th><th>Delivered</th><th>Earning</th></tr>
+    {% for o in completed %}
+    <tr>
+        <td>{{ o.order_number }}</td>
+        <td>{{ o.restaurant.name }}</td>
+        <td>{{ o.updated_at.strftime('%d %b, %H:%M') }}</td>
+        <td>₦{{ "%.2f"|format(o.delivery_fee) }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="4">No completed deliveries yet.</td></tr>
+    {% endfor %}
+</table>
+{% endblock %}

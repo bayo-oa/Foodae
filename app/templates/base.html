@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Local Food{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="{{ url_for('customer.homepage') }}" class="brand">🍲 LocalFood</a>
+        <div class="nav-links">
+            {% if current_user.is_authenticated %}
+                {% if current_user.role == 'CUSTOMER' %}
+                    <a href="{{ url_for('customer.homepage') }}">Menu</a>
+                    <a href="{{ url_for('customer.view_cart') }}">Cart</a>
+                    <a href="{{ url_for('customer.order_history') }}">My Orders</a>
+                {% elif current_user.role == 'VENDOR' %}
+                    <a href="{{ url_for('vendor.dashboard') }}">Dashboard</a>
+                    <a href="{{ url_for('vendor.orders') }}">Orders</a>
+                    <a href="{{ url_for('vendor.menu') }}">Menu</a>
+                    <a href="{{ url_for('vendor.settings') }}">Settings</a>
+                {% elif current_user.role == 'RIDER' %}
+                    <a href="{{ url_for('rider.dashboard') }}">Dashboard</a>
+                {% elif current_user.role == 'ADMIN' %}
+                    <a href="{{ url_for('admin.dashboard') }}">Admin</a>
+                    <a href="{{ url_for('admin.users') }}">Users</a>
+                    <a href="{{ url_for('admin.restaurants') }}">Restaurants</a>
+                    <a href="{{ url_for('admin.riders') }}">Riders</a>
+                    <a href="{{ url_for('admin.orders') }}">Orders</a>
+                {% endif %}
+                <span class="nav-user">{{ current_user.full_name }} ({{ current_user.role }})</span>
+                <a href="{{ url_for('auth.logout') }}">Logout</a>
+            {% else %}
+                <a href="{{ url_for('auth.login') }}">Login</a>
+                <a href="{{ url_for('auth.register') }}">Register</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <div class="flash-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash flash-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

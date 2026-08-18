@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Checkout{% endblock %}
+{% block content %}
+<h2>Checkout</h2>
+
+<div class="card">
+    <h3>Order Summary — {{ restaurant.name }}</h3>
+    <table>
+        {% for ci in cart_items %}
+        <tr><td>{{ ci.food_item.name }} x{{ ci.quantity }}</td><td>₦{{ "%.2f"|format(ci.food_item.price * ci.quantity) }}</td></tr>
+        {% endfor %}
+    </table>
+    <p>Subtotal: ₦{{ "%.2f"|format(subtotal) }}</p>
+    <p>Delivery Fee: ₦{{ "%.2f"|format(delivery_fee) }}</p>
+    <p><strong>Total: ₦{{ "%.2f"|format(total) }}</strong></p>
+</div>
+
+<div class="card">
+    <h3>Delivery Address</h3>
+    <form method="POST">
+        {% if addresses %}
+        <label>Choose a saved address</label>
+        <select name="address_id">
+            <option value="">-- select --</option>
+            {% for a in addresses %}
+            <option value="{{ a.id }}">{{ a.label }}: {{ a.full_address }}</option>
+            {% endfor %}
+        </select>
+        <p style="color:#888; font-size:0.85rem;">Or add a new one below:</p>
+        {% endif %}
+        <label>New address label</label>
+        <input type="text" name="new_address_label" placeholder="e.g. Home, Office">
+        <label>New address</label>
+        <input type="text" name="new_address" placeholder="Full delivery address">
+        <label>Phone for this address</label>
+        <input type="text" name="new_address_phone">
+        <label>Special instructions</label>
+        <textarea name="special_instructions" rows="2" placeholder="e.g. Less pepper please"></textarea>
+        <button type="submit">Proceed to Payment</button>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Monitor Orders{% endblock %}
+{% block content %}
+<h2>All Orders</h2>
+<form method="GET" style="flex-direction:row;">
+    <select name="status" onchange="this.form.submit()">
+        <option value="">All statuses</option>
+        {% for s in all_statuses %}
+        <option value="{{ s }}" {% if status_filter==s %}selected{% endif %}>{{ STATUS_LABELS.get(s, s) }}</option>
+        {% endfor %}
+    </select>
+</form>
+<table style="margin-top:12px;">
+    <tr><th>Order #</th><th>Restaurant</th><th>Customer</th><th>Status</th><th>Total</th><th>Placed</th><th></th></tr>
+    {% for o in orders %}
+    <tr>
+        <td>{{ o.order_number }}</td>
+        <td>{{ o.restaurant.name }}</td>
+        <td>{{ o.customer.full_name }}</td>
+        <td>{{ STATUS_LABELS.get(o.status, o.status) }}</td>
+        <td>₦{{ "%.2f"|format(o.total) }}</td>
+        <td>{{ o.created_at.strftime("%Y-%m-%d %H:%M") }}</td>
+        <td><a href="{{ url_for('admin.order_detail', order_id=o.id) }}">View</a></td>
+    </tr>
+    {% else %}
+    <tr><td colspan="7">No orders match this filter.</td></tr>
+    {% endfor %}
+</table>
+{% endblock %}

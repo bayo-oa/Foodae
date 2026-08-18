@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+<h2>Platform Overview</h2>
+<div class="stats-row">
+    <div class="stat-box"><div class="num">{{ stats.total_users }}</div><div class="label">Total Users</div></div>
+    <div class="stat-box"><div class="num">{{ stats.active_restaurants }}</div><div class="label">Active Restaurants</div></div>
+    <div class="stat-box"><div class="num">{{ stats.active_riders }}</div><div class="label">Active Riders</div></div>
+    <div class="stat-box"><div class="num">{{ stats.orders_today }}</div><div class="label">Orders Today</div></div>
+    <div class="stat-box"><div class="num">{{ stats.orders_in_progress }}</div><div class="label">In Progress</div></div>
+    <div class="stat-box"><div class="num">₦{{ "%.2f"|format(stats.revenue_today) }}</div><div class="label">Revenue Today</div></div>
+    <div class="stat-box"><div class="num">{{ stats.cancelled_orders }}</div><div class="label">Cancelled (all time)</div></div>
+</div>
+{% endblock %}

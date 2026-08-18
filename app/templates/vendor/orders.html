@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Orders{% endblock %}
+{% block content %}
+<h2>Orders</h2>
+<div class="tabs">
+    {% for key, label in [('active','Active'), ('new','New'), ('accepted','Accepted'), ('preparing','Preparing'), ('ready','Ready/Out'), ('completed','Completed'), ('cancelled','Cancelled')] %}
+    <a class="tab {% if status_filter==key %}active{% endif %}" href="{{ url_for('vendor.orders', status=key) }}">{{ label }}</a>
+    {% endfor %}
+</div>
+
+<table>
+    <tr><th>Order #</th><th>Customer</th><th>Total</th><th>Status</th><th>Placed</th><th></th></tr>
+    {% for order in orders %}
+    <tr>
+        <td>{{ order.order_number }}</td>
+        <td>{{ order.customer.full_name }}</td>
+        <td>₦{{ "%.2f"|format(order.total) }}</td>
+        <td><span class="badge badge-status">{{ STATUS_LABELS.get(order.status, order.status) }}</span></td>
+        <td>{{ order.created_at.strftime('%d %b, %H:%M') }}</td>
+        <td><a href="{{ url_for('vendor.order_detail', order_id=order.id) }}">View</a></td>
+    </tr>
+    {% else %}
+    <tr><td colspan="6">No orders in this view.</td></tr>
+    {% endfor %}
+</table>
+{% endblock %}

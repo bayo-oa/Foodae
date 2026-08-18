@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Payment Result{% endblock %}
+{% block content %}
+<div class="card" style="text-align:center; padding:30px;">
+{% if order.payment.status == 'SUCCESSFUL' %}
+    <h2>✅ Order Confirmed</h2>
+    <p>Order Number: <strong>{{ order.order_number }}</strong></p>
+    <p>Restaurant: {{ order.restaurant.name }}</p>
+    <p>Delivery Address: {{ order.delivery_address.full_address }}</p>
+    <p>Total Paid: ₦{{ "%.2f"|format(order.total) }}</p>
+    <a href="{{ url_for('customer.track_order', order_id=order.id) }}" class="btn">Track My Order</a>
+{% elif order.payment.status == 'FAILED' %}
+    <h2>❌ Payment Failed</h2>
+    <p>Your payment could not be confirmed. No order was placed.</p>
+    <a href="{{ url_for('customer.homepage') }}" class="btn">Back to Restaurants</a>
+{% else %}
+    <h2>⏳ Verifying Payment...</h2>
+    <p>Please wait a moment and refresh this page.</p>
+{% endif %}
+</div>
+{% endblock %}

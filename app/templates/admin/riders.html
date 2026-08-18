@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Manage Riders{% endblock %}
+{% block content %}
+<h2>Riders</h2>
+<table style="margin-top:12px;">
+    <tr><th>Name</th><th>Phone</th><th>Vehicle</th><th>Account</th><th>Approval</th><th></th></tr>
+    {% for r in riders %}
+    <tr>
+        <td>{{ r.full_name }}</td>
+        <td>{{ r.phone or "-" }}</td>
+        <td>{{ r.vehicle_type or "-" }}</td>
+        <td>{{ "Active" if r.is_active else "Suspended" }}</td>
+        <td>{{ "Approved" if r.rider_is_approved else "Pending" }}</td>
+        <td>
+            <form method="POST" action="{{ url_for('admin.toggle_rider_approval', rider_id=r.id) }}">
+                <button type="submit" class="btn-sm {% if r.rider_is_approved %}btn-danger{% endif %}">
+                    {{ "Unapprove" if r.rider_is_approved else "Approve" }}
+                </button>
+            </form>
+        </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="6">No riders yet.</td></tr>
+    {% endfor %}
+</table>
+{% endblock %}

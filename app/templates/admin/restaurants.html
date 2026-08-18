@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Manage Restaurants{% endblock %}
+{% block content %}
+<h2>Restaurants</h2>
+<table style="margin-top:12px;">
+    <tr><th>Name</th><th>Address</th><th>Open</th><th>Approval</th><th></th></tr>
+    {% for r in restaurants %}
+    <tr>
+        <td>{{ r.name }}</td>
+        <td>{{ r.address }}</td>
+        <td>{{ "Open" if r.is_open else "Closed" }}</td>
+        <td>{{ "Approved" if r.is_approved else "Pending" }}</td>
+        <td>
+            <form method="POST" action="{{ url_for('admin.toggle_restaurant_approval', restaurant_id=r.id) }}">
+                <button type="submit" class="btn-sm {% if r.is_approved %}btn-danger{% endif %}">
+                    {{ "Unapprove" if r.is_approved else "Approve" }}
+                </button>
+            </form>
+        </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="5">No restaurants yet.</td></tr>
+    {% endfor %}
+</table>
+{% endblock %}

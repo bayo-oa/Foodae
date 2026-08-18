@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Vendor Dashboard{% endblock %}
+{% block content %}
+<h2>{{ restaurant.name }}</h2>
+<p>
+    {% if restaurant.is_approved %}<span class="badge" style="background:#d9f2e3;color:#1a6b3c;">Approved</span>
+    {% else %}<span class="badge" style="background:#fff3cd;color:#856404;">Pending Approval</span>{% endif %}
+    {% if restaurant.is_open %}<span class="badge" style="background:#d9f2e3;color:#1a6b3c;">Open</span>
+    {% else %}<span class="badge" style="background:#eee;">Closed</span>{% endif %}
+</p>
+
+<div class="stats-row">
+    <div class="stat-box"><div class="num">{{ stats.today_orders }}</div><div class="label">Today's Orders</div></div>
+    <div class="stat-box"><div class="num">{{ stats.pending_orders }}</div><div class="label">Pending Orders</div></div>
+    <div class="stat-box"><div class="num">{{ stats.completed_orders }}</div><div class="label">Completed</div></div>
+    <div class="stat-box"><div class="num">{{ stats.cancelled_orders }}</div><div class="label">Cancelled</div></div>
+    <div class="stat-box"><div class="num">₦{{ "%.2f"|format(stats.today_revenue) }}</div><div class="label">Today's Revenue</div></div>
+</div>
+
+<div class="card" style="margin-top:20px;">
+    <a href="{{ url_for('vendor.orders') }}" class="btn">Manage Orders</a>
+    <a href="{{ url_for('vendor.menu') }}" class="btn btn-secondary">Manage Menu</a>
+    <a href="{{ url_for('vendor.settings') }}" class="btn btn-secondary">Settings</a>
+</div>
+{% endblock %}

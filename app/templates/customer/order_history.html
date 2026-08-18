@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}My Orders{% endblock %}
+{% block content %}
+<h2>My Orders</h2>
+{% for order in orders %}
+<div class="card">
+    <p><strong>{{ order.order_number }}</strong> — {{ order.restaurant.name }}
+        <span class="badge badge-status">{{ STATUS_LABELS.get(order.status, order.status) }}</span></p>
+    <p>₦{{ "%.2f"|format(order.total) }} — {{ order.created_at.strftime('%d %b %Y, %H:%M') }}</p>
+    {% if order.status not in ['PENDING_PAYMENT'] %}
+    <a href="{{ url_for('customer.track_order', order_id=order.id) }}">Track / View</a>
+    {% endif %}
+
+    {% if order.status == 'DELIVERED' and order.rating is none %}
+    <form method="POST" action="{{ url_for('customer.rate_order', order_id=order.id) }}" style="margin-top:10px; flex-direction:row; gap:6px;">
+        <select name="rating">
+            {% for i in range(5,0,-1) %}<option value="{{ i }}">{{ i }} star{{ 's' if i>1 }}</option>{% endfor %}
+        </select>
+        <input type="text" name="comment" placeholder="Optional comment">
+        <button type="submit" class="btn-sm">Rate Order</button>
+    </form>
+    {% elif order.rating %}
+    <p>Your rating: {{ order.rating }}/5 {% if order.rating_comment %}— "{{ order.rating_comment }}"{% endif %}</p>
+    {% endif %}
+</div>
+{% else %}
+<p>No orders yet. <a href="{{ url_for('customer.homepage') }}">Start ordering</a></p>
+{% endfor %}
+{% endblock %}

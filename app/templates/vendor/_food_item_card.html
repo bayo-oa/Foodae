@@ -1,0 +1,14 @@
+<div class="card">
+    {% if item.image_url %}<img src="{{ item.image_url }}" style="width:100%; height:120px; object-fit:cover; border-radius:6px;">{% endif %}
+    <strong>{{ item.name }}</strong>
+    <div>₦{{ "%.2f"|format(item.price) }}</div>
+    <div class="badge {% if item.is_available %}badge-status{% endif %}">{{ "Available" if item.is_available else "Unavailable" }}</div>
+    <div style="margin-top:8px; display:flex; gap:6px; flex-wrap:wrap;">
+        <form method="POST" action="{{ url_for('vendor.toggle_food_item', item_id=item.id) }}">
+            <button type="submit" class="btn-sm btn-secondary">{{ "Mark Unavailable" if item.is_available else "Mark Available" }}</button>
+        </form>
+        <form method="POST" action="{{ url_for('vendor.delete_food_item', item_id=item.id) }}" onsubmit="return confirm('Delete this item?');">
+            <button type="submit" class="btn-sm btn-danger">Delete</button>
+        </form>
+    </div>
+</div>

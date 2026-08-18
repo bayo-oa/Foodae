@@ -1,0 +1,7 @@
+-r requirements.txt
+
+# Only needed when connecting to a real PostgreSQL database (e.g. on Render).
+# Not required for local development against SQLite.
+# If this fails to build locally on a very new Python version (no prebuilt wheel yet),
+# that's fine -- you don't need it until you deploy against Postgres.
+psycopg2-binary==2.9.9

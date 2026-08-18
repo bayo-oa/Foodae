@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Order {{ order.order_number }}{% endblock %}
+{% block content %}
+<h2>Order {{ order.order_number }}</h2>
+<p><a href="{{ url_for('admin.orders') }}">&larr; Back to all orders</a></p>
+
+<p><strong>Status:</strong> {{ STATUS_LABELS.get(order.status, order.status) }}</p>
+<p><strong>Restaurant:</strong> {{ order.restaurant.name }}</p>
+<p><strong>Customer:</strong> {{ order.customer.full_name }} ({{ order.customer.email }}, {{ order.customer.phone or "no phone" }})</p>
+{% if order.rider %}
+<p><strong>Rider:</strong> {{ order.rider.full_name }} ({{ order.rider.phone or "no phone" }})</p>
+{% else %}
+<p><strong>Rider:</strong> Not yet assigned</p>
+{% endif %}
+<p><strong>Delivery address:</strong> {{ order.delivery_address.full_address if order.delivery_address else "-" }}</p>
+{% if order.special_instructions %}
+<p><strong>Special instructions:</strong> {{ order.special_instructions }}</p>
+{% endif %}
+{% if order.cancellation_reason %}
+<p><strong>Cancellation reason:</strong> {{ order.cancellation_reason }}</p>
+{% endif %}
+
+<h3>Items</h3>
+<table>
+    <tr><th>Item</th><th>Qty</th><th>Unit Price</th><th>Line Total</th></tr>
+    {% for item in order.items %}
+    <tr>
+        <td>{{ item.food_name_snapshot }}</td>
+        <td>{{ item.quantity }}</td>
+        <td>₦{{ "%.2f"|format(item.unit_price) }}</td>
+        <td>₦{{ "%.2f"|format(item.unit_price * item.quantity) }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<p><strong>Subtotal:</strong> ₦{{ "%.2f"|format(order.subtotal) }}</p>
+<p><strong>Delivery fee:</strong> ₦{{ "%.2f"|format(order.delivery_fee) }}</p>
+<p><strong>Total:</strong> ₦{{ "%.2f"|format(order.total) }}</p>
+
+{% if order.payment %}
+<h3>Payment</h3>
+<p>Provider: {{ order.payment.provider }} — Status: {{ order.payment.status }} — Ref: {{ order.payment.transaction_ref }}</p>
+{% endif %}
+
+<p style="margin-top:16px; color:#666; font-size:0.9em;">
+    Admins monitor orders here but do not change order status directly — that stays with the
+    vendor and rider actions defined by the order state machine.
+</p>
+{% endblock %}

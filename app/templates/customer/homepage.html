@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}What are you craving?{% endblock %}
+{% block content %}
+<h2>What are you craving?</h2>
+<form method="GET" style="flex-direction:row; max-width:600px;">
+    <input type="text" name="q" placeholder="Search food, restaurants..." value="{{ query }}">
+    <button type="submit">Search</button>
+</form>
+
+<h3 style="margin-top:24px;">Restaurants Near You</h3>
+<div class="grid">
+    {% for r in restaurants %}
+    <a href="{{ url_for('customer.restaurant_page', restaurant_id=r.id) }}" style="text-decoration:none; color:inherit;">
+        <div class="card">
+            {% if r.cover_image_url %}<img src="{{ r.cover_image_url }}" style="width:100%; height:120px; object-fit:cover; border-radius:6px;">{% endif %}
+            <strong>{{ r.name }}</strong>
+            <div style="font-size:0.85rem; color:#888;">{{ r.description or '' }}</div>
+            <div style="margin-top:6px;">
+                <span class="badge">₦{{ "%.2f"|format(r.delivery_fee) }} delivery</span>
+                <span class="badge {% if r.is_open %}badge-status{% endif %}">{{ "Open" if r.is_open else "Closed" }}</span>
+            </div>
+        </div>
+    </a>
+    {% else %}
+    <p>No restaurants found. Try a different search.</p>
+    {% endfor %}
+</div>
+{% endblock %}

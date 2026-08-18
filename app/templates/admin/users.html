@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Manage Users{% endblock %}
+{% block content %}
+<h2>Users</h2>
+<form method="GET" style="flex-direction:row;">
+    <input type="text" name="q" placeholder="Search name/email" value="{{ query }}">
+    <select name="role">
+        <option value="">All roles</option>
+        <option value="CUSTOMER" {% if role_filter=='CUSTOMER' %}selected{% endif %}>Customer</option>
+        <option value="VENDOR" {% if role_filter=='VENDOR' %}selected{% endif %}>Vendor</option>
+        <option value="RIDER" {% if role_filter=='RIDER' %}selected{% endif %}>Rider</option>
+    </select>
+    <button type="submit">Filter</button>
+</form>
+<table style="margin-top:12px;">
+    <tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th></th></tr>
+    {% for u in users %}
+    <tr>
+        <td>{{ u.full_name }}</td>
+        <td>{{ u.email }}</td>
+        <td>{{ u.role }}</td>
+        <td>{{ "Active" if u.is_active else "Suspended" }}</td>
+        <td>
+            <form method="POST" action="{{ url_for('admin.toggle_user_active', user_id=u.id) }}">
+                <button type="submit" class="btn-sm {% if u.is_active %}btn-danger{% endif %}">{{ "Suspend" if u.is_active else "Reactivate" }}</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}
