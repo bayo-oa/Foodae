@@ -14,13 +14,23 @@ class BaseConfig:
         _db_url = _db_url.replace("postgres://", "postgresql://", 1)
     SQLALCHEMY_DATABASE_URI = _db_url
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SQLALCHEMY_ENGINE_OPTIONS = {
-        # Conservative pool sizing for free-tier Postgres connection limits.
-        "pool_size": 5,
-        "max_overflow": 2,
-        "pool_pre_ping": True,
-        "pool_recycle": 280,
-    }
+
+    if _db_url.startswith("postgresql://"):
+        SQLALCHEMY_ENGINE_OPTIONS = {
+            # Conservative pool sizing for free-tier Postgres connection limits.
+            "pool_size": 5,
+            "max_overflow": 2,
+            "pool_pre_ping": True,
+            "pool_recycle": 280,
+        }
+    else:
+        # SQLite (e.g. local dev with DATABASE_URL=sqlite:///dev.db) uses a
+        # different default pool implementation that does NOT accept
+        # pool_size/max_overflow -- passing them raises a TypeError at engine
+        # creation time. Keep only the option that's universally safe.
+        SQLALCHEMY_ENGINE_OPTIONS = {
+            "pool_pre_ping": True,
+        }
 
     UPLOAD_FOLDER = os.path.join(basedir, "app", "static", "uploads")
     MAX_CONTENT_LENGTH = 5 * 1024 * 1024  # 5MB max upload
